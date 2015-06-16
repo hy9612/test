@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body{
+        font-family: sans-serif;
+        margin: 25px;
+        color: #333633;
+        padding: 30px;
+        padding-bottom: 60px;
+        border: 5px double #495d04;
+      }
+      
+      h1 {
+        padding-bottom: 10px;
+        border-bottom: 10px double #00a28f;
+        font-size: 40px;
+      }
+      
+      select {
+        margin-left: 60px;
+      }
+      
+      p {
+        font-size: 15px;
+        line-height: 25px;
+      }
+      
+      span {
+        background-color: yellow;
+        padding: 3px;
+        border-radius: 5px;
+      }
+      
+      .divdiv { 
+        margin: 20px;
+        background-color: #e5ebe0;
+        padding-left: 25px;
+        padding-right: 40px;
+        border: 1px solid #008914;
+        background-image: url("http://i.imgur.com/X1UyQW6.png") ;
+        background-repeat: no-repeat;
+        background-position: right;
+      }
+      
+      .axis text {
+        font: 10px sans-serif;
+      }
+      
+      .div2 {
+        margin-left: 60px;
+        margin-bottom: 65px;
+      }
+      .div3 {
+        margin-left: 60px;
+      }
+      .axis line,
+      .axis path {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>용돈기입장의 시각화</h1>
+    <div class = "divdiv"><h2>1. 왜 보여주는가?</h2></div>
+    <div class = "div2">
+      <p>최근 용돈이 미친듯이 많이 빠져나가서 어디서 빠져나가는지 확인이 필요하다.</p>
+      <h3><font color = "#d60000">이대로 가다간 거지가 될 지 모른다!</font></h3>
+      <p>내 용돈이 일주일에 얼마나 빠져나가는지를 시각화한다.</p>
+      <p>식비, 교통비, 재료비, 기타 경비로 분류하여, 얼마나 사용되었는지 비율로 보여주면 어디에 제일 많이 나가는지 알 수 있을 것 같다.</p></div>
+
+    <div class = "divdiv"><h2>2. 어떻게 보여주는가?</h2></div>
+    <div class = "div2">
+      <p>데이터 입력이 용이해야 좀 써먹을 수 있을 것 같다.</p>
+      <p>파이형태로 비율을 보여줄 수 있어야 하고, 날짜별로 데이터를 보여줄 수 있어야 한다.</p>
+      <p><img style="border: 2px solid gray; " src="http://i.imgur.com/Q8tXtcz.png"></p>
+      <p><b>Dispatching Event</b> 활용, 사용한 돈의 총량과 어디에 얼마나 썼는지 깔끔하게 시각화 가능하다.</p>
+      <p>이벤트의 활용, <b>csv</b> 활용으로 데이터 기입 및 데이터 교체 용이성을 확보한다.(csv로 작업하면 매주마다 csv만 갈아주면 된다)</p></div>
+    <div class="divdiv"><h2>3. 작업 하면서, 작업 후 느낀 점</h2></div>
+    <div class = "div2">
+      <p>이벤트 활용이 너무너무너무 어렵다.</p>
+      <p>어디서 어떻게 밸류를 가져와야할지 구체적으로 이해하지 못했다. 결국 숫자 데이터 보여주는 건 포기했다.</p>
+      <p>통계표, 비율 등의 데이터를 다룰때는 csv만큼 편한 게 없는 것 같다. 그리고 외부 파일이라 이거 갈아치우면 매주마다 데이터 쌓인다!</p>
+      <p>구글드라이브에 csv를 연동하니까 더 편하다. json도 연동될 것 같다.</p>
+      <p>하루에 거의 2만원씩 쓴다.</p>
+      <p>인쇄비는 월요일 말고 나갈 일이 없었다.</p>
+      <p>늦잠자고 택시타는 악순환의 고리...</p>
+      <p>기타경비에서 담배값 4500원이 용돈을 순식간에 먹어치운다. 고마워요 뒤로가는 그네정부!</p>
+      <p>의외로 먹을걸로 돈이 많이 안나갔다. 저때 아파서 그랬던 것 같다.</p>
+      <p>병원비가 무지막지하다. 용돈이 일격에 주님곁으로 갔다.</p>
+      <p>'금욕이 답이다'라는 결론에 도달했지만 그걸 지키면 사람이 아니라 부처인 걸로.</p>
+    </div>
+  <div class = "divdiv"><h2>4. 결과물</h2></div>
+    <div class= "div3"><h3><font color="#bc3664">EAT</font> <font color="#1695e5">TRANSPORT</font> <font color="#16e53e">PRINT</font> <font color="#7b7f81">ETC</font></h3></div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+      var dispatch = d3.dispatch("load", "statechange");
+
+      var groups = [
+        "Transport",
+        "Eat",
+        "Print",
+        "ETC",
+      ];
+
+      d3.csv("http://www.googledrive.com/host/0B5xlQE6M_E5lOVFWZEN1RW82MTA", type, function(error, states) {
+        if (error) throw error;
+        var stateById = d3.map();
+        states.forEach(function(d) { stateById.set(d.id, d); });
+        dispatch.load(stateById);
+        dispatch.statechange(stateById.get("MON"));
+      });
+      dispatch.on("load.menu", function(stateById) {
+        var select = d3.select("body")
+          .append("div")
+          .append("select")
+            .on("change", function() { dispatch.statechange(stateById.get(this.value)); });
+
+        select.selectAll("option")
+            .data(stateById.values())
+          .enter().append("option")
+            .attr("value", function(d) { return d.id; })
+            .text(function(d) { return d.id; });
+
+        dispatch.on("statechange.menu", function(state) {
+          select.property("value", state.id);
+        });
+      });
+      dispatch.on("load.bar", function(stateById) {
+        var margin = {top: 20, right: 20, bottom: 30, left: 100},
+            width = 140 - margin.left - margin.right,
+            height = 460 - margin.top - margin.bottom;
+
+        var y = d3.scale.linear()
+            .domain([0, d3.max(stateById.values(), function(d) { return d.total; })])
+            .rangeRound([height, 0])
+            .nice();
+
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left")
+            .tickFormat(d3.format(".2s"));
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        var rect = svg.append("rect")
+            .attr("x", 4)
+            .attr("width", width - 4)
+            .attr("y", height)
+            .attr("height", 0)
+            .style("fill", "#aaa");
+
+        dispatch.on("statechange.bar", function(d) {
+          rect.transition()
+              .attr("y", y(d.total))
+              .attr("height", y(0) - y(d.total));
+        });
+      });
+
+      dispatch.on("load.pie", function(stateById) {
+        var width = 580,
+            height = 460,
+            radius = Math.min(width, height) / 2;
+
+        var color = d3.scale.ordinal()
+            .domain(groups)
+            .range(["#1695e5", "#bc3664", "#4ace4a", "rgb(141, 154, 146)"]);
+
+        var arc = d3.svg.arc()
+            .outerRadius(radius - 10)
+            .innerRadius(radius - 90);
+
+        var pie = d3.layout.pie()
+            .sort(null);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+          .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var path = svg.selectAll("path")
+            .data(groups)
+          .enter().append("path")
+            .style("fill", color)
+            .each(function() { this._current = {startAngle: 0, endAngle: 0}; });
+
+        dispatch.on("statechange.pie", function(d) {
+          path.data(pie.value(function(g) { return d[g]; })(groups)).transition()
+              .attrTween("d", function(d) {
+                var interpolate = d3.interpolate(this._current, d);
+                this._current = interpolate(0);
+                return function(t) {
+                  return arc(interpolate(t));
+                };
+              });
+        });
+      });
+      function type(d) {
+        d.total = d3.sum(groups, function(k) { return d[k] = +d[k]; });
+        return d;
+      }
+  </script>
+  </body>
+</html>
